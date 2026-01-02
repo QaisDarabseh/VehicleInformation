@@ -1,32 +1,38 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using VehicleInformation.Models;
+using VehicleInformation.Services.Interfaces;
 
 namespace VehicleInformation.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IVehicleApiService _vehicleApiService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IVehicleApiService vehicleApiService)
         {
-            _logger = logger;
+            _vehicleApiService = vehicleApiService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var makes = await _vehicleApiService.GetAllMakesAsync();
+            return View(makes);
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public async Task<IActionResult> GetVehicleTypes(int makeId)
         {
-            return View();
+            var types = await _vehicleApiService.GetVehicleTypesForMakeAsync(makeId);
+            return Json(types);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpGet]
+        public async Task<IActionResult> GetModels(int makeId, int year)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var models = await _vehicleApiService.GetModelsAsync(makeId, year);
+            return Json(models);
         }
+
     }
 }

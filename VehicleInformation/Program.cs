@@ -1,23 +1,27 @@
+using VehicleInformation.Services;
+using VehicleInformation.Services.Interfaces;
+using VehicleInformation.Models.Helpers;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.Configure<VehicleApiOptions>(builder.Configuration.GetSection("VehicleApi")); 
+
+
+builder.Services.AddHttpClient<IVehicleApiService, VehicleApiService>();
+builder.Services.AddScoped<IVehicleApiService, VehicleApiService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
